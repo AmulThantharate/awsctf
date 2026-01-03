@@ -40,20 +40,4 @@ release:
     name: awsctf
   draft: false
   prerelease: false
-
-brews:
-  - name: awsctf
-    homepage: https://github.com/Amul-Thantharate/awsctf
-    description: "AWSCTF – intentionally vulnerable cloud scenarios"
-    license: Apache-2.0
-
-    repository:
-      owner: Amul-Thantharate
-      name: homebrew-tap
-
-    commit_author:
-      name: goreleaser
-      email: goreleaser@users.noreply.github.com
-
-    install: |
-      bin.install "awsctf"
+  name_template: "v{{ .Version }}"
