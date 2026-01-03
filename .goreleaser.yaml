@@ -31,7 +31,7 @@ checksum:
 
 release:
   github:
-    owner: Amul-Thantharate
+    owner: AmulThantharate
     name: awsctf
   draft: false
   prerelease: false
