@@ -36,3 +36,13 @@ release:
   draft: false
   prerelease: false
   name_template: "v{{ .Version }}"
+
+dockers:
+  - image_templates:
+      - "ghcr.io/amulthantharate/awsctf:{{ .Version }}"
+      - "ghcr.io/amulthantharate/awsctf:latest"
+    dockerfile: Dockerfile
+    build_flag_templates:
+      - "--label=org.opencontainers.image.source=https://github.com/amulthantharate/awsctf"
+      - "--label=org.opencontainers.image.description=AWSCTF Range CLI"
+      - "--label=org.opencontainers.image.licenses=Apache-2.0"
