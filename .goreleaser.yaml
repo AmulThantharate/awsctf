@@ -1,0 +1,59 @@
+version: 2
+
+project_name: awsctf
+
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - id: cloudgoat
+    main: .
+    binary: cloudgoat
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w
+      - -X main.version={{ .Version }}
+
+archives:
+  - id: default
+    format: tar.gz
+    name_template: >-
+      {{ .ProjectName }}_{{ .Os }}_{{ .Arch }}
+    files:
+      - LICENSE
+      - README.md
+
+checksum:
+  name_template: checksums.txt
+
+release:
+  github:
+    owner: Amul-Thantharate
+    name: awsctf
+  draft: false
+  prerelease: false
+
+brews:
+  - name: awsctf
+    homepage: https://github.com/Amul-Thantharate/awsctf
+    description: "AWSCTF – intentionally vulnerable cloud scenarios"
+    license: Apache-2.0
+
+    repository:
+      owner: Amul-Thantharate
+      name: homebrew-tap
+
+    commit_author:
+      name: goreleaser
+      email: goreleaser@users.noreply.github.com
+
+    install: |
+      bin.install "awsctf"
