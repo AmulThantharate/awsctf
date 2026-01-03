@@ -2,6 +2,9 @@
 
 Welcome to the **AWS Cloud Security CTF Collection**. This repository contains a set of high-fidelity, real-world inspired Capture The Flag (CTF) challenges designed to test your skills in AWS exploitation, container security, and network pivot attacks.
 
+[![Release](https://img.shields.io/github/v/release/AmulThantharate/awsctf)](https://github.com/AmulThantharate/awsctf/releases)
+[![Docker](https://img.shields.io/badge/docker-ghcr.io-blue)](https://github.com/AmulThantharate/awsctf/pkgs/container/awsctf)
+
 > **⚠️ WARNING**: These challenges deploy **intentionally vulnerable infrastructure** into your AWS account.
 > - **DO NOT** deploy this in a production account.
 > - **DO NOT** leave resources running; they will incur costs and pose security risks.
@@ -25,8 +28,7 @@ Before you begin, ensure you have the following installed and configured:
 1.  **AWS CLI**: [Install Guide](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
     - Configured with `Admin` privileges: `aws configure`
 2.  **Terraform**: [Install Guide](https://developer.hashicorp.com/terraform/downloads)
-3.  **Docker** (required for some challenges): [Install Guide](https://docs.docker.com/get-docker/)
-4.  **Go** (optional, for local analysis): [Install Guide](https://go.dev/doc/install)
+3.  **Docker** (Required if using the containerized CLI): [Install Guide](https://docs.docker.com/get-docker/)
 
 ---
 
@@ -34,28 +36,33 @@ Before you begin, ensure you have the following installed and configured:
 
 ### ⚡ Installation
 
-#### Option 1: Homebrew (macOS/Linux)
+#### Option 1: Docker (Recommended)
+The easiest way to run `awsctf` without installing Go or Terraform locally is to use the official Docker image.
 ```bash
-brew install Amul-Thantharate/tap/awsctf
+docker pull ghcr.io/amulthantharate/awsctf:latest
+```
+
+To run a command:
+```bash
+docker run --rm -it \
+  -v ~/.aws:/root/.aws \
+  -v $(pwd):/app \
+  ghcr.io/amulthantharate/awsctf:latest help
 ```
 
 #### Option 2: Binary Release
-Download the latest binary from the [Releases](https://github.com/Amul-Thantharate/awsctf/releases) page.
+Download the latest binary for your OS from the [Releases](https://github.com/AmulThantharate/awsctf/releases) page.
 
-#### Option 3: Build from Source
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/Amul-Thantharate/awsctf.git
-   cd awsctf
-   ```
-2. Build the binary:
-   ```bash
-   go build -o bin/awsctf main.go
-   ```
+#### Option 3: Homebrew (macOS/Linux)
+```bash
+brew install AmulThantharate/homebrew-tap/awsctf
+```
+
+---
 
 ### ⚡ Quick Start with `awsctf` CLI
 
-Once installed (if built from source, use `./bin/awsctf`), follow these steps:
+Once installed, follow these steps:
 
 1. **Configure Credentials**:
    ```bash
@@ -87,65 +94,33 @@ Once installed (if built from source, use `./bin/awsctf`), follow these steps:
 If you prefer to run things manually or don't want to use the CLI, you can use the instructions below.
 
 #### 1. CloudStrike: GoDeep (Insane)
-
 An advanced scenario simulating a compromised internal application.
 
 **Setup:**
 ```bash
-./bin/awsctf create cloudstrike_godeep
-# OR manually:
-cd awsctf/cloudstrike_godeep/deploy.sh
-./deploy.sh
+cd awsctf/cloudstrike_godeep/terraform
+terraform init
+terraform apply
 ```
-
-**Start Hacking:**
-- Wait for the output to provide the `Target IP`.
-- Access the application at `http://<TARGET_IP>`.
 
 **Teardown:**
 ```bash
-./bin/awsctf destroy cloudstrike_godeep
-# OR manually:
-./awsctf/cloudstrike_godeep/destroy.sh
+terraform destroy
 ```
 
 #### 2. Container Escape CTF
-
 A challenge focused on container isolation breakout techniques.
 
 **Setup:**
 ```bash
-./bin/awsctf create container-escape-ctf
-# OR manually:
-./awsctf/container-escape-ctf/deploy.sh
-```
-
-**Start Hacking:**
-- Use the `Target IP` from the output to access the initial entry point.
-
-**Teardown:**
-```bash
-./bin/awsctf destroy container-escape-ctf
-# OR manually:
-./awsctf/container-escape-ctf/destroy.sh
-```
-
-#### 3. SSRF & RCE Challenge
-
-A scenario combining Server-Side Request Forgery and Remote Code Execution.
-
-**Setup:**
-```bash
-./bin/awsctf create ctf_challenge
-# OR manually:
-cd awsctf/ctf_challenge
-chmod +x deploy.sh
-./deploy.sh
+cd awsctf/container-escape-ctf/terraform
+terraform init
+terraform apply
 ```
 
 **Teardown:**
 ```bash
-./bin/awsctf destroy ctf_challenge
+terraform destroy
 ```
 
 ---
@@ -154,7 +129,6 @@ chmod +x deploy.sh
 
 - **Cost Warning**: These labs use real AWS resources (EC2, ECR, Load Balancers, NAT Gateways, etc.). Be mindful of costs.
 - **Security**: The deployed resources are vulnerable by design. Access is typically restricted by security groups, but do not host sensitive data in the account used for these labs.
-- **Homebrew**: If you installed using Homebrew, use `brew upgrade awsctf` to update.
 
 ## 🤝 Contributing
 
@@ -165,7 +139,6 @@ Pull requests are welcome. For major changes, please open an issue first to disc
 This project is for educational purposes only.
 
 **Author**: Amul Thantharate
-**GitHub**: [Amul-Thantharate](https://github.com/Amul-Thantharate)
-**Twitter**: [AmulThantharate](https://twitter.com/AmulThantharate)
+**GitHub**: [AmulThantharate](https://github.com/AmulThantharate)
 **LinkedIn**: [Amul Thantharate](https://www.linkedin.com/in/amul-thantharate/)
 **Email**: amul.thantharate@gmail.com
