@@ -5,7 +5,7 @@ project_name: awsctf
 builds:
   - id: awsctf
     main: .
-    binary: awsctf
+    binary: awsctf-cli
     env:
       - CGO_ENABLED=0
     goos:
@@ -42,6 +42,12 @@ dockers:
       - "ghcr.io/amulthantharate/awsctf:{{ .Version }}"
       - "ghcr.io/amulthantharate/awsctf:latest"
     dockerfile: Dockerfile
+    extra_files:
+      - go.mod
+      - go.sum
+      - main.go
+      - cmd/
+      - awsctf/
     build_flag_templates:
       - "--label=org.opencontainers.image.source=https://github.com/amulthantharate/awsctf"
       - "--label=org.opencontainers.image.description=AWSCTF Range CLI"
