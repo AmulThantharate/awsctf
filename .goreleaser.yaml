@@ -7,9 +7,9 @@ before:
     - go mod tidy
 
 builds:
-  - id: cloudgoat
+  - id: awsctf
     main: .
-    binary: cloudgoat
+    binary: awsctf
     env:
       - CGO_ENABLED=0
     goos:
