@@ -2,10 +2,6 @@ version: 2
 
 project_name: awsctf
 
-before:
-  hooks:
-    - go mod tidy
-
 builds:
   - id: awsctf
     main: .
@@ -20,7 +16,6 @@ builds:
       - arm64
     ldflags:
       - -s -w
-      - -X main.version={{ .Version }}
 
 archives:
   - id: default
