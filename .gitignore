@@ -47,3 +47,4 @@ walkthrough.md
 # Added by goreleaser init:
 dist/
 .env
+.walkthrough.md
